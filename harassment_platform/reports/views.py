@@ -52,7 +52,7 @@ def report_submission(request):
         date = request.POST.get('date')
         time = request.POST.get('time')
         harassment_type = request.POST.get('harassment_type')
-        reported_by = request.POST.get('reported_by')
+        reported_by = request.POST.get('role')
         description = request.POST.get('description')
         
 
@@ -78,6 +78,7 @@ def report_submission(request):
                 date=date,
                 time=time,
                 harassment_type=harassment_type,
+                reported_by=reported_by,
                 description=description,
                 latitude=latitude,
                 longitude=longitude

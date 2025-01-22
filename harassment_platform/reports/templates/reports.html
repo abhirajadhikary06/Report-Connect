@@ -16,7 +16,7 @@
         .report-header span:not(:last-child)::after {
             content: '|';
             margin: 0 0.5rem;
-            color: #888;
+            color: #ffffff;
         }
         .report-description {
             margin-top: 0.5rem;
@@ -68,7 +68,7 @@
                                     <span><b>{{ report.harassment_type }}</b></span>
                                     <span><b>{{ report.date|date:"M. j, Y" }}</b></span>
                                     <span><b>{{ report.time|time:"g:i a" }}</b></span>
-                                    <!--<span><b>{{ report.reported_by }}</b></span>-->
+                                    <span><b>{{ report.reported_by }}</b></span>
                                 </div>
                                 <p class="report-description">
                                     {{ report.description }}
