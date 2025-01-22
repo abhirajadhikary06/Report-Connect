@@ -1,0 +1,84 @@
+{% load static %}
+<!-- reports.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports List</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma/css/bulma.min.css">
+    <style>
+        .report-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .report-header span:not(:last-child)::after {
+            content: '|';
+            margin: 0 0.5rem;
+            color: #888;
+        }
+        .report-description {
+            margin-top: 0.5rem;
+            margin-left: 74px;  /* 64px (image width) + 10px padding */
+            color: #4a4a4a;
+        }
+    </style>
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title">List of Harassment Reports</h1>
+
+            <form method="get" class="box">
+                <div class="field">
+                    <label class="label">Filter by Type</label>
+                    <div class="control">
+                        <input class="input" type="text" name="type" placeholder="Enter type of harassment">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Filter by Location</label>
+                    <div class="control">
+                        <input class="input" type="text" name="location" placeholder="Enter location">
+                    </div>
+                </div>
+                <div class="control">
+                    <button class="button is-primary" type="submit">Apply Filters</button>
+                </div>
+            </form>
+
+            <div class="buttons">
+                <a class="button is-link" href="{% url 'report_submission' %}">Submit a Report</a>
+                <a class="button is-light" href="{% url 'home' %}">Home</a>
+            </div>
+
+            <div class="box">
+                {% for report in reports %}
+                    <article class="media">
+                        <figure class="media-left">
+                            <p class="image is-64x64">
+                                <img class="is-rounded" src="/static/images/profile_pictures/{{ report.random_image }}" alt="Profile">
+                            </p>
+                        </figure>
+                        <div class="media-content">
+                            <div class="content">
+                                <div class="report-header">
+                                    <span><b>{{ report.location }}</b></span>
+                                    <span><b>{{ report.harassment_type }}</b></span>
+                                    <span><b>{{ report.date|date:"M. j, Y" }}</b></span>
+                                    <span><b>{{ report.time|time:"g:i a" }}</b></span>
+                                    <span><b>{{ report.reported_by }}</b></span>
+                                </div>
+                                <p class="report-description">
+                                    {{ report.description }}
+                                </p>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</body>
+</html>

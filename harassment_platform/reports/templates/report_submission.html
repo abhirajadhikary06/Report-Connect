@@ -1,0 +1,153 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit a Report</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma/css/bulma.min.css">
+    <style>
+        .toggle-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f5f5f5;
+            border-radius: 25px;
+            width: 150px;
+            padding: 5px;
+            position: relative;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+        .toggle-button input[type="radio"] {
+            display: none;
+        }
+        .toggle-button span {
+            width: 50%;
+            text-align: center;
+            padding: 10px 0;
+            font-weight: bold;
+            color: #4a4a4a;
+        }
+        .toggle-button .slider {
+            position: absolute;
+            top: 5px;
+            bottom: 5px;
+            width: 50%;
+            border-radius: 20px;
+            background-color: #00d1b2;
+            transition: transform 0.3s ease;
+        }
+        input[type="radio"]:checked + label {
+            color: white;
+        }
+        input[type="radio"]#victim:checked ~ .slider {
+            transform: translateX(0);
+        }
+        input[type="radio"]#non-victim:checked ~ .slider {
+            transform: translateX(100%);
+        }
+    </style>
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title">Submit a Harassment Report</h1>
+
+            {% if success %}
+                <div class="notification is-success">
+                    Your report has been successfully submitted.
+                </div>
+            {% endif %}
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const notification = document.querySelector('.notification');
+                    if (notification) {
+                        setTimeout(() => {
+                            notification.style.display = 'none';
+                        }, 5000); // Hide after 5 seconds
+                    }
+                });
+            </script>
+
+            <form method="post" class="box">
+                {% csrf_token %}
+                <!-- Victim or Non-Victim Toggle -->
+                <div class="field">
+                    <label class="label">Are you a Victim or Non-Victim?</label>
+                    <div class="control">
+                        <label class="radio">
+                            <input type="radio" name="role" value="victim" checked>
+                            Victim
+                        </label>
+                        <label class="radio">
+                            <input type="radio" name="role" value="non-victim">
+                            Non-Victim
+                        </label>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Location</label>
+                    <div class="control">
+                        <input class="input" type="text" name="location" placeholder="Enter the location" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Date</label>
+                    <div class="control">
+                        <input class="input" type="date" name="date" placeholder="e.g., 2025-01-01" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Approximate Time</label>
+                    <div class="control">
+                        <input class="input" type="text" name="time" placeholder="e.g., 10:30:00 - 24hrs format" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Type of Harassment</label>
+                    <div class="control">
+                        <div class="select">
+                            <select name="harassment_type" required>
+                                <option value="verbal">Verbal</option>
+                                <option value="physical">Physical</option>
+                                <option value="cyber">Cyber</option>
+                                <option value="sexual">Sexual</option>
+                                <option value="emotional">Emotional or Psychological</option>
+                                <option value="stalking">Stalking</option>
+                                <option value="workplace">Workplace</option>
+                                <option value="public">Public</option>
+                                <option value="intimidation">Intimidation</option>
+                                <option value="discrimination">Discrimination</option>
+                                <option value="invasive">Invasive Questions</option>
+                                <option value="gossip">Gossip and Rumors</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Description</label>
+                    <div class="control">
+                        <textarea class="textarea" name="description" placeholder="Provide a detailed description" required></textarea>
+                    </div>
+                </div>
+
+                <div class="control">
+                    <button class="button is-primary" type="submit">Submit Report</button>
+                </div>
+            </form>
+
+            <div class="buttons">
+                <a href="{% url 'reports_list' %}" class="button is-link">View Reports</a>
+                <a href="{% url 'home' %}" class="button is-light">Home</a>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

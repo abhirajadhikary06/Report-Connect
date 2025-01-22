@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Harassment Reports Map</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma/css/bulma.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <style>
+        #map {
+            height: 500px;
+            margin-top: 20px;
+        }
+        .navbar {
+            background-color: none;  /* Same as background color */
+        }
+        .navbar-brand {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        .logo-image {
+            max-height: 50px;  /* Adjust based on your logo size */
+            padding: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Added Navbar -->
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="{% url 'home' %}">
+                <img src="{% static 'path/to/your/logo.png' %}" class="logo-image" alt="Site Logo">
+            </a>
+        </div>  
+    </nav>
+
+    <section class="section">
+        <div class="container">
+            <h1 class="title">Harassment Reports Map</h1>
+            <p>Explore areas with reported harassment incidents.</p>
+            <div class="buttons">
+                <a href="{% url 'report_submission' %}" class="button is-primary">Submit a Report</a>
+                <a href="{% url 'reports_list' %}" class="button is-link">View All Reports</a>
+            </div>
+            <div id="map"></div>
+        </div>
+    </section>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map').setView([22.5726, 88.3639], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+        }).addTo(map);
+    
+        try {
+            const reports = JSON.parse('{{ reports|safe }}');
+            reports.forEach(report => {
+                if (report.lat && report.lng) {  // Check if coordinates exist
+                    const circle = L.circle([report.lat, report.lng], {
+                        color: 'red',
+                        fillColor: '#f03',
+                        fillOpacity: 0.5,
+                        radius: 500
+                    }).addTo(map);
+    
+                    // Add popup with information
+                    circle.bindPopup(`
+                        <strong>Location:</strong> ${report.location}<br>
+                        <strong>Type:</strong> ${report.type}
+                    `);
+                }
+            });
+        } catch (e) {
+            console.error("Error parsing reports:", e);
+        }
+    </script>
+</body>
+</html>
