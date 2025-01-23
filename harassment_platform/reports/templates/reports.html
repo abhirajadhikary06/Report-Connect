@@ -53,6 +53,12 @@
 
         .input::placeholder {
             color: #888;
+
+        .report-header span:not(:last-child)::after {
+            content: '|';
+            margin: 0 0.5rem;
+            color: #ffffff;
+
         }
 
         .button.is-primary, .button.is-link, .button.is-light {
@@ -165,6 +171,7 @@
                 </form>
             </div>
 
+
             <!-- Reports Section -->
             <div class="reports-section">
                 <h1 class="title">List of Harassment Reports</h1>
@@ -180,6 +187,25 @@
                             <figure class="media-left">
                                 <p class="image is-64x64">
                                     <img class="is-rounded" src="/static/images/profile_pictures/{{ report.random_image }}" alt="Profile">
+            <div class="box">
+                {% for report in reports %}
+                    <article class="media">
+                        <figure class="media-left">
+                            <p class="image is-64x64">
+                                <img class="is-rounded" src="/static/images/profile_pictures/{{ report.random_image }}" alt="Profile">
+                            </p>
+                        </figure>
+                        <div class="media-content">
+                            <div class="content">
+                                <div class="report-header">
+                                    <span><b>{{ report.location }}</b></span>
+                                    <span><b>{{ report.harassment_type }}</b></span>
+                                    <span><b>{{ report.date|date:"M. j, Y" }}</b></span>
+                                    <span><b>{{ report.time|time:"g:i a" }}</b></span>
+                                    <span><b>{{ report.reported_by }}</b></span>
+                                </div>
+                                <p class="report-description">
+                                    {{ report.description }}
                                 </p>
                             </figure>
                             <div class="media-content">
