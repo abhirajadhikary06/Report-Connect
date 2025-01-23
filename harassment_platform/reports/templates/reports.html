@@ -8,51 +8,185 @@
     <title>Reports List</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma/css/bulma.min.css">
     <style>
-        .report-header {
+        /* General Styling */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #000000 50%, #8B0000 50%);
+            color: #fff;
+            overflow-x: hidden;
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            flex-direction: column;
         }
+
+        body {
+            flex: 1;
+        }
+
+        .title {
+            color: rgb(215, 29, 29);
+            text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.8);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .filter-section {
+            background-color: rgba(255, 0, 0, 0.2);
+            padding: 1.5rem;
+            border: 1px solid #8B0000;
+            border-radius: 6px;
+        }
+
+        .container {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+
+        .input {
+            background-color: #1e1e1e;
+            color: #f0f0f0;
+            border: 1px solid #ff4d4d;
+        }
+
+        .input::placeholder {
+            color: #888;
+
         .report-header span:not(:last-child)::after {
             content: '|';
             margin: 0 0.5rem;
             color: #ffffff;
+
         }
+
+        .button.is-primary, .button.is-link, .button.is-light {
+            background-color: #8B0000; /* Dark red */
+            border-color: #8B0000;
+            color: white;
+        }
+
+        .button.is-primary:hover, .button.is-link:hover, .button.is-light:hover {
+            background-color: #FF6347; /* Light red for hover */
+            border-color: #FF6347;
+            color: white;
+        }
+
+        .media-left .image img {
+            border: 2px solid #FF0000;
+            transition: transform 0.3s ease-in-out; /* Image zoom effect */
+        }
+
+        .media-left img:hover {
+            transform: scale(1.1); /* Zoom the image slightly */
+        }
+
+        .report-header span {
+            color: #FF6347;
+        }
+
+        .report-header span:not(:last-child)::after {
+            color: #f0f0f0;
+        }
+
         .report-description {
-            margin-top: 0.5rem;
-            margin-left: 74px;  /* 64px (image width) + 10px padding */
-            color: #4a4a4a;
+            color: #f0f0f0;
+        }
+
+        /* Reports Section - Now wider and non-transparent */
+        .reports-section {
+            background-color: #320202; /* Solid dark red background */
+            padding: 2rem; /* Increased padding */
+            border: none; /* Removed border */
+            border-radius: 8px; /* Rounded corners */
+            width: 100%; /* Full width */
+            max-width: 1200px; /* Max width to avoid stretch */
+            margin: 0 auto; /* Centering the section */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Optional shadow for depth */
+        }
+
+       /* Footer */
+       footer {
+            text-align: center;
+            padding: 10px;
+            background: rgb(27, 27, 27);
+            color: white;
+            position: relative;
+            width: 100%;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+            margin-top: auto; /* Ensures footer stays at the bottom */
+        }
+
+        footer a {
+            color: #FF6347; /* Vibrant orange-red */
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        footer a:hover {
+            color: #FF4500; /* Slightly darker red for hover */
+            text-decoration: underline;
+        }
+
+        /* Clear Floats */
+        .clearfix::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        footer a {
+            color: #FF6347;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: #FF4500;
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <section class="section">
         <div class="container">
-            <h1 class="title">List of Harassment Reports</h1>
-
-            <form method="get" class="box">
-                <div class="field">
-                    <label class="label">Filter by Type</label>
-                    <div class="control">
-                        <input class="input" type="text" name="type" placeholder="Enter type of harassment">
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <form method="get">
+                    <div class="field">
+                        <label class="label">Filter by Type</label>
+                        <div class="control">
+                            <input class="input" type="text" name="type" placeholder="Enter type of harassment">
+                        </div>
                     </div>
-                </div>
-                <div class="field">
-                    <label class="label">Filter by Location</label>
-                    <div class="control">
-                        <input class="input" type="text" name="location" placeholder="Enter location">
+                    <div class="field">
+                        <label class="label">Filter by Location</label>
+                        <div class="control">
+                            <input class="input" type="text" name="location" placeholder="Enter location">
+                        </div>
                     </div>
-                </div>
-                <div class="control">
-                    <button class="button is-primary" type="submit">Apply Filters</button>
-                </div>
-            </form>
-
-            <div class="buttons">
-                <a class="button is-link" href="{% url 'report_submission' %}">Submit a Report</a>
-                <a class="button is-light" href="{% url 'home' %}">Home</a>
+                    <div class="control">
+                        <button class="button is-primary" type="submit">Apply Filters</button>
+                    </div>
+                </form>
             </div>
 
+
+            <!-- Reports Section -->
+            <div class="reports-section">
+                <h1 class="title">List of Harassment Reports</h1>
+                
+                <div class="buttons">
+                    <a class="button is-link" href="{% url 'report_submission' %}">Submit a Report</a>
+                    <a class="button is-light" href="{% url 'home' %}">Home</a>
+                </div>
+
+                <div class="box">
+                    {% for report in reports %}
+                        <article class="media">
+                            <figure class="media-left">
+                                <p class="image is-64x64">
+                                    <img class="is-rounded" src="/static/images/profile_pictures/{{ report.random_image }}" alt="Profile">
             <div class="box">
                 {% for report in reports %}
                     <article class="media">
@@ -73,12 +207,39 @@
                                 <p class="report-description">
                                     {{ report.description }}
                                 </p>
+                            </figure>
+                            <div class="media-content">
+                                <div class="content">
+                                    <div class="report-header">
+                                        <span><b>{{ report.location }}</b></span>
+                                        <span><b>{{ report.harassment_type }}</b></span>
+                                        <span><b>{{ report.date|date:"M. j, Y" }}</b></span>
+                                        <span><b>{{ report.time|time:"g:i a" }}</b></span>
+                                    </div>
+                                    <p class="report-description">
+                                        {{ report.description }}
+                                    </p>
+                                </div>
                             </div>
-                        </div>
-                    </article>
-                {% endfor %}
+                        </article>
+                    {% endfor %}
+                </div>
             </div>
         </div>
+    </section>
+
+    <!-- Footer Section -->
+    <section>
+        <footer>
+            <div class="content has-text-centered">
+                <p>
+                    <strong>Harassment Reports Map</strong> by <a href="#">Your Organization</a>. Making the world a safer place, one report at a time.
+                </p>
+                <p>
+                    © 2025 All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Use</a>
+                </p>
+            </div>
+        </footer>
     </section>
 </body>
 </html>
