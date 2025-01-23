@@ -37,6 +37,7 @@
             padding: 1.5rem;
             border: 1px solid #8B0000;
             border-radius: 6px;
+            margin-top: 195px
         }
 
         .container {
@@ -139,6 +140,35 @@
             color: #FF4500;
             text-decoration: underline;
         }
+
+
+        .buttons {
+        display: flex;
+        justify-content : Center; /* Center horizontally */
+        gap: 1rem; /* Add spacing between buttons */
+        margin-top: 2rem;
+        }
+
+        /* Divider Styling */
+        .heading-divider {
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, #FFD700, #FF4500, #FFD700); /* Gold to red gradient */
+        margin: 15px auto;
+        border-radius: 10px;
+        background-size: 200% 100%; /* Necessary for shimmer effect */
+        animation: shimmer 2s infinite linear; /* Animated shimmer */
+    }
+
+    /* Shimmer Animation */
+    @keyframes shimmer {
+        0% {
+            background-position: 0% 50%;
+        }
+        100% {
+            background-position: 100% 50%;
+        }
+    }
     </style>
 </head>
 <body>
@@ -169,6 +199,7 @@
             <div class="reports-section">
                 <h1 class="title">List of Harassment Reports</h1>
                 
+                <div class="heading-divider"></div>
                 <div class="buttons">
                     <a class="button is-link" href="{% url 'report_submission' %}">Submit a Report</a>
                     <a class="button is-light" href="{% url 'home' %}">Home</a>
