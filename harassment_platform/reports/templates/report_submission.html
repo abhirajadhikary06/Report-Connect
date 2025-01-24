@@ -7,86 +7,177 @@
     <title>Submit a Report</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma/css/bulma.min.css">
     <style>
-        .toggle-button {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #f5f5f5;
-            border-radius: 25px;
-            width: 150px;
-            padding: 5px;
-            position: relative;
-            cursor: pointer;
-            margin-bottom: 1rem;
+        /* Styles (same as before) */
+        body {
+            background-color: #000;
+            color: #f5f5f5;
+            font-family: "Roboto", sans-serif;
         }
-        .toggle-button input[type="radio"] {
-            display: none;
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
         }
-        .toggle-button span {
-            width: 50%;
+        .title {
+            color:rgb(216, 0, 0);
+            font-size: 2.5rem;
             text-align: center;
-            padding: 10px 0;
+        }
+
+        /* Custom Success Notification Color */
+        .notification.is-success {
+            background-color:rgb(180, 0, 0); /* Green background */
+            color: #fff; /* White text */
+        }
+    
+        .notification.is-success strong {
+            color: #fff; /* White text for the strong tag */
+        }
+        .box {
+            background-color: #121212;
+            border: 2px solidrgb(255, 255, 255);
+            border-radius: 10px;
+            padding: 30px;
+        }
+        input, textarea, select {
+            background-color: #000;
+            border: 1px solid #444;
+            color: #f5f5f5;
+            border-radius: 5px;
+        }
+        input:hover, textarea:hover, select:hover {
+            border-color: #ff0033;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color:rgb(204, 91, 114);
+        }
+        .button {
+            background-color: #ff0033;
+            border: none;
+            color: #fff;
             font-weight: bold;
-            color: #4a4a4a;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.2s;
         }
-        .toggle-button .slider {
-            position: absolute;
-            top: 5px;
-            bottom: 5px;
-            width: 50%;
-            border-radius: 20px;
-            background-color: #00d1b2;
-            transition: transform 0.3s ease;
+        .button:hover {
+            background-color: #cc002a;
+            transform: translateY(-3px);
         }
-        input[type="radio"]:checked + label {
+
+        /* Footer */
+       footer {
+            text-align: center;
+            padding: 10px;
+            background: rgb(27, 27, 27);
             color: white;
+            position: relative;
+            width: 100%;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+            margin-top: auto; /* Ensures footer stays at the bottom */
         }
-        input[type="radio"]#victim:checked ~ .slider {
-            transform: translateX(0);
+
+        footer a {
+            color: #FF6347; /* Vibrant orange-red */
+            text-decoration: none;
+            font-weight: bold;
         }
-        input[type="radio"]#non-victim:checked ~ .slider {
-            transform: translateX(100%);
+
+        footer a:hover {
+            color: #FF4500; /* Slightly darker red for hover */
+            text-decoration: underline;
         }
+        
+        /* Divider Styling */
+
+        .heading-divider {
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, #FFD700, #FF4500, #FFD700); /* Gold to red gradient */
+            margin: 15px auto;
+            border-radius: 10px;
+            animation: shimmer 2s infinite linear; /* Animated shimmer */
+        }
+
+        /* Shimmer Animation */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                text-shadow: 0 0 10px rgba(255, 0, 0, 0.2), 0 0 20px rgba(0, 0, 0, 0.5);
+            }
+            50% {
+                transform: scale(1.05);
+                text-shadow: 0 0 20px rgb(90, 8, 8), 0 0 40px rgba(0, 0, 0, 0.8);
+            }
+            100% {
+                transform: scale(1);
+                text-shadow: 0 0 10px rgba(255, 215, 0, 0.2), 0 0 20px rgba(0, 0, 0, 0.5);
+            }
+        }
+        
+        #heading {
+            animation: pulse 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200px 0;
+            }
+            100% {
+                background-position: 200px 0;
+            }
+        }
+        
+        .shimmer-effect {
+            background: linear-gradient(
+                90deg,
+                rgba(255, 0, 0, 0.1) 25%,  /* Light red */
+                rgba(255, 215, 0, 0.5) 50%, /* Golden */
+                rgba(255, 0, 0, 0.1) 75%   /* Light red */
+            );
+            background-size: 400px 100%; /* Determines the shimmer width */
+            animation: shimmer 3s infinite;
+            color: #fff; /* Text color on top of shimmer */
+            padding: 10px 20px; /* Optional styling */
+            border-radius: 5px; /* Optional styling */
+            display: inline-block; /* Ensure it works with content */
+        }
+    
     </style>
 </head>
 <body>
     <section class="section">
         <div class="container">
             <h1 class="title">Submit a Harassment Report</h1>
+            <div class="heading-divider"></div>
 
+            <!-- Success Message -->
             {% if success %}
                 <div class="notification is-success">
-                    Your report has been successfully submitted.
+                    <strong>Your report has been successfully submitted!</strong>
                 </div>
             {% endif %}
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    const notification = document.querySelector('.notification');
-                    if (notification) {
-                        setTimeout(() => {
-                            notification.style.display = 'none';
-                        }, 5000); // Hide after 5 seconds
-                    }
-                });
-            </script>
 
             <form method="post" class="box">
                 {% csrf_token %}
-                <!-- Victim or Non-Victim Toggle -->
-                
+
+                <!-- Victim/Non-Victim Radio Buttons -->
                 <div class="field">
-                    <label class="label">Are you a Victim or Non-Victim?</label>
+                    <label class="label">Are you the victim or a non-victim?</label>
                     <div class="control">
                         <label class="radio">
-                            <input type="radio" name="role" value="victim" checked>
+                            <input type="radio" name="role" value="victim" required>
                             Victim
                         </label>
                         <label class="radio">
-                            <input type="radio" name="role" value="non-victim">
+                            <input type="radio" name="role" value="non-victim" required>
                             Non-Victim
                         </label>
                     </div>
                 </div>
+
+                <!-- Location -->
                 <div class="field">
                     <label class="label">Location</label>
                     <div class="control">
@@ -94,13 +185,15 @@
                     </div>
                 </div>
 
+                <!-- Date -->
                 <div class="field">
                     <label class="label">Date</label>
                     <div class="control">
-                        <input class="input" type="date" name="date" placeholder="e.g., 2025-01-01" required>
+                        <input class="input" type="date" name="date" required>
                     </div>
                 </div>
 
+                <!-- Approximate Time -->
                 <div class="field">
                     <label class="label">Approximate Time</label>
                     <div class="control">
@@ -108,6 +201,7 @@
                     </div>
                 </div>
 
+                <!-- Type of Harassment -->
                 <div class="field">
                     <label class="label">Type of Harassment</label>
                     <div class="control">
@@ -131,6 +225,7 @@
                     </div>
                 </div>
 
+                <!-- Description -->
                 <div class="field">
                     <label class="label">Description</label>
                     <div class="control">
@@ -138,16 +233,23 @@
                     </div>
                 </div>
 
+                <!-- Submit Button -->
                 <div class="control">
                     <button class="button is-primary" type="submit">Submit Report</button>
                 </div>
             </form>
 
-            <div class="buttons">
-                <a href="{% url 'reports_list' %}" class="button is-link">View Reports</a>
+            <!-- Navigation Buttons -->
+            <div class="buttons" style="text-align: center;">
+                <a href="{% url 'reports_list' %}" class="button is-light">View Reports</a>
                 <a href="{% url 'home' %}" class="button is-light">Home</a>
             </div>
         </div>
     </section>
+
+    <!-- Footer Section -->
+    <footer>
+        <p>Made with <span>❤️</span> by XYZ team</p>
+    </footer>
 </body>
 </html>
