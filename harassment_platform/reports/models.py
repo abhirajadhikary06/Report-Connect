@@ -2,20 +2,28 @@ from django.db import models
 
 class HarassmentReport(models.Model):
     HARASSMENT_TYPE_CHOICES = [
-        ('verbal', 'Verbal'),
-        ('physical', 'Physical'),
-        ('cyber', 'Cyber'),
-        ('sexual', 'Sexual'),
-        ('emotional', 'Emotional or Psychological'),
-        ('stalking', 'Stalking'),
-        ('workplace', 'Workplace'),
-        ('public', 'Public'),
-        ('intimidation', 'Intimidation'),
-        ('discrimination', 'Discrimination'),
-        ('invasive', 'Invasive Questions'),
-        ('gossip', 'Gossip and Rumors'),
-        ('other', 'Other'),
-    ]
+    ('arson', 'Arson'),
+    ('assault', 'Assault'),
+    ('burglary', 'Burglary'),
+    ('counterfeiting', 'Counterfeiting'),
+    ('cybercrime', 'Cybercrime'),
+    ('domestic_violence', 'Domestic Violence'),
+    ('drug_offense', 'Drug Offense'),
+    ('extortion', 'Extortion'),
+    ('firearm_offense', 'Firearm Offense'),
+    ('fraud', 'Fraud'),
+    ('homicide', 'Homicide'),
+    ('identity_theft', 'Identity Theft'),
+    ('illegal_possession', 'Illegal Possession'),
+    ('kidnapping', 'Kidnapping'),
+    ('public_intoxication', 'Public Intoxication'),
+    ('robbery', 'Robbery'),
+    ('sexual_assault', 'Sexual Assault'),
+    ('shoplifting', 'Shoplifting'),
+    ('traffic_violation', 'Traffic Violation'),
+    ('vandalism', 'Vandalism'),
+    ('vehicle_stolen', 'Vehicle - Stolen'),
+]
     date = models.DateField()
     time = models.TimeField()
     location = models.CharField(max_length=100)
