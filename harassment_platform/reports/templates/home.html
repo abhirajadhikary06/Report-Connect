@@ -161,12 +161,11 @@
             border-radius: 5px; /* Optional styling */
             display: inline-block; /* Ensure it works with content */
         }
-    
-        
+
         /* Map Styling */
         #map {
             height: 600px;
-            width: 95vw;
+            width: 85vw;
             margin: 10px;
             position: relative;
             background: #000; /* Dark background to make the glow stand out */
@@ -186,6 +185,38 @@
             100% {
                 box-shadow: 0 0 35px rgba(255, 0, 0, 1), 0 0 30px rgba(255, 0, 0, 0.6); /* Stronger glow */
             }
+        }
+
+        #hotspot-map {
+            height: 600px;
+            width: 85vw;
+            margin: 10px;
+            position: relative;
+            background: #000; /* Dark background to make the glow stand out */
+            border-radius: 10px;
+            overflow: hidden; /* Prevents the glow from spilling outside */
+            box-shadow: 0 0 15px rgba(0, 255, 8, 0.5); /* Initial subtle red glow */
+            animation: glow-2 1.5s infinite alternate; /* Glow animation */
+        }
+
+        @keyframes glow-2 {
+            0% {
+                box-shadow: 0 0 15px rgba(0, 255, 8, 0.5), 0 0 10px rgba(0, 255, 8, 0.3); /* Initial glow */
+            }
+            50% {
+                box-shadow: 0 0 25px rgba(0, 255, 8, 1), 0 0 20px rgba(0, 255, 8, 0.7); /* Increased intensity */
+            }
+            100% {
+                box-shadow: 0 0 35px rgba(0, 255, 8, 1), 0 0 30px rgba(0, 255, 8, 0.6); /* Stronger glow */
+            }
+        }
+
+        .map-heading {
+            font-size: 3rem; /* Larger font size */
+            color:rgba(0, 255, 8); /* Gold text */
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.5); /* Glowing effect */
+            position: relative;
+            z-index: 2; /* Ensure heading is above divider */
         }
 
         /* Quote Section */
@@ -247,7 +278,12 @@
         }
 
         .map-and-info {
-            display : flex;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 100px;
+            width: 100%;
+            padding: 20px;
         }
             
             /* Buttons */
@@ -367,6 +403,9 @@
     <div class="map-and-info clearfix">
         <!-- Map Section -->
         <div class="map-container" id="map"></div>
+        <!-- Hotspot Map Section -->
+        <h1 class="map-heading">Predicted Crime Location</h1>
+        <div class="map-container" id="hotspot-map"></div>
     </div>
 </section>
 
@@ -378,6 +417,7 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     
     <script>
+        // Initialize Map
         var map = L.map('map').setView([22.5726, 88.3639], 12);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
@@ -403,6 +443,27 @@
             });
         } catch (e) {
             console.error("Error parsing reports:", e);
+        }
+
+        // Initialize Hotspot Map
+        var hotspotMap = L.map('hotspot-map').setView([22.5726, 88.3639], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+        }).addTo(hotspotMap);
+
+        try {
+            const hotspot = JSON.parse('{{ hotspot|safe }}');
+            if (hotspot && hotspot.lat && hotspot.lng) {
+                L.marker([hotspot.lat, hotspot.lng], {
+                    icon: L.divIcon({
+                        className: 'custom-icon',
+                        html: '<div style="background:green; width:12px; height:12px; border-radius:50%;"></div>',
+                        iconSize: [12, 12]
+                    })
+                }).addTo(hotspotMap).bindPopup('<strong>Predicted Crime Hotspot</strong>');
+            }
+        } catch (e) {
+            console.error("Error parsing hotspot data:", e);
         }
     </script>
     

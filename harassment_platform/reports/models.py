@@ -40,3 +40,11 @@ class HarassmentReport(models.Model):
 
     def __str__(self):
         return f"{self.location} - {self.harassment_type}"
+
+class PredictedHotspot(models.Model):
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    prediction_time = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Predicted Hotspot at ({self.latitude}, {self.longitude})"

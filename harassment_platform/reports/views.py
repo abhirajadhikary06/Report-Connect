@@ -3,6 +3,8 @@ from django.shortcuts import render, redirect
 from .models import HarassmentReport
 from .forms import HarassmentReportForm
 from geopy.geocoders import Nominatim
+import json
+from .crime_prediction import predict_crime_hotspot
 
 def home(request):
     # Get all reports from the database
@@ -17,14 +19,15 @@ def home(request):
             'type': report.harassment_type
         } for report in reports
     ]
-    
-    # Import json
-    import json
-    
+       
+    # Get predicted hotspot
+    predicted_hotspot = predict_crime_hotspot()
+
     context = {
-        'reports': json.dumps(reports_data)
+        'reports': json.dumps(reports_data),
+        'hotspot': json.dumps(predicted_hotspot) if predicted_hotspot else None
     }
-    
+
     return render(request, 'home.html', context)
 
 
