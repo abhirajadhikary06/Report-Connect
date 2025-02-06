@@ -28,7 +28,7 @@ def get_lat_lon(location):
     return None, None  # Return None if geocoding fails
 
 # Correct file path for the Excel file
-file_path = os.path.join(BASE_DIR, "reports", "cleaned-crime-dataset2.csv")
+file_path = os.path.join(BASE_DIR, "reports", "cleaned-crime-dataset.csv")
 
 # Check if file exists
 if not os.path.exists(file_path):
