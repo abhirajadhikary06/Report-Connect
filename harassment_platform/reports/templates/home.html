@@ -446,10 +446,18 @@
         }
 
         // Initialize Hotspot Map
+        var hotspotsData = JSON.parse('{{ hotspot | escapejs }}');
+
         var hotspotMap = L.map('hotspot-map').setView([22.5726, 88.3639], 12);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
         }).addTo(hotspotMap);
+
+        hotspotsData.forEach(function(hotspot) {
+            L.marker([hotspot.lat, hotspot.lng])
+                .addTo(hotspotMap)
+                .bindPopup("<b>" + hotspot.title + "</b><br>" + hotspot.description);
+        });
 
         try {
             const hotspot = JSON.parse('{{ hotspot|safe }}');
@@ -457,7 +465,7 @@
                 L.marker([hotspot.lat, hotspot.lng], {
                     icon: L.divIcon({
                         className: 'custom-icon',
-                        html: '<div style="background:green; width:12px; height:12px; border-radius:50%;"></div>',
+                        html: '<div style="background:#d4fc79; width:12px; height:12px; border-radius:50%;"></div>', /* Neon Hotspot Color */
                         iconSize: [12, 12]
                     })
                 }).addTo(hotspotMap).bindPopup('<strong>Predicted Crime Hotspot</strong>');

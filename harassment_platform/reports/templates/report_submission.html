@@ -151,8 +151,6 @@
         <div class="container">
             <h1 class="title">Submit a Harassment Report</h1>
             <div class="heading-divider"></div>
-
-            <!-- Success Message -->
             {% if success %}
                 <div class="notification is-success" id="success-message">
                     <strong>Your report has been successfully submitted!</strong>
@@ -163,11 +161,8 @@
                     }, 2000);
                 </script>
             {% endif %}
-
-            <form method="post" class="box">
+            <form method="post" class="box" id="report-form">
                 {% csrf_token %}
-
-                <!-- Victim/Non-Victim Radio Buttons -->
                 <div class="field">
                     <label class="label">Are you the victim or a non-victim?</label>
                     <div class="control">
@@ -181,32 +176,29 @@
                         </label>
                     </div>
                 </div>
-
-                <!-- Location -->
                 <div class="field">
                     <label class="label">Location</label>
                     <div class="control">
-                        <input class="input" type="text" name="location" placeholder="Enter the location" required>
+                        <input class="input" type="text" name="location" id="location" placeholder="Enter the location" required>
                     </div>
                 </div>
-
-                <!-- Date -->
+                <div class="field">
+                    <button class="button is-info" type="button" id="auto-location-btn">Use Current Location</button>
+                </div>
+                <input type="hidden" id="latitude" name="latitude">
+                <input type="hidden" id="longitude" name="longitude">
                 <div class="field">
                     <label class="label">Date</label>
                     <div class="control">
                         <input class="input" type="date" name="date" required>
                     </div>
                 </div>
-
-                <!-- Approximate Time -->
                 <div class="field">
                     <label class="label">Approximate Time</label>
                     <div class="control">
                         <input class="input" type="text" name="time" placeholder="e.g., 10:30:00 - 24hrs format" required>
                     </div>
                 </div>
-
-                <!-- Type of Crime -->
                 <div class="field">
                     <label class="label">Type of Crime</label>
                     <div class="control">
@@ -233,36 +225,68 @@
                                 <option value="traffic violation">Traffic Violation</option>
                                 <option value="vandalism">Vandalism</option>
                                 <option value="vehicle stolen">Vehicle - Stolen</option>
-                            </select>                            
+                            </select>
                         </div>
                     </div>
                 </div>
-
-                <!-- Description -->
                 <div class="field">
                     <label class="label">Description</label>
                     <div class="control">
                         <textarea class="textarea" name="description" placeholder="Provide a detailed description" required></textarea>
                     </div>
                 </div>
-
-                <!-- Submit Button -->
                 <div class="control">
                     <button class="button is-primary" type="submit">Submit Report</button>
                 </div>
             </form>
-
-            <!-- Navigation Buttons -->
             <div class="buttons" style="text-align: center;">
                 <a href="{% url 'reports_list' %}" class="button is-light">View Reports</a>
                 <a href="{% url 'home' %}" class="button is-light">Home</a>
             </div>
         </div>
     </section>
-
-    <!-- Footer Section -->
     <footer>
-        <p>Made with <span>❤️</span> by <b>Glitch Goblins</b> team</p>
+        <p>Made with <span>❤️</span> by <b>Quantum Coders</b> team</p>
     </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const autoLocationBtn = document.getElementById("auto-location-btn");
+            const locationInput = document.getElementById("location");
+            const latitudeInput = document.getElementById("latitude");
+            const longitudeInput = document.getElementById("longitude");
+
+            autoLocationBtn.addEventListener("click", function () {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        function (position) {
+                            const latitude = position.coords.latitude;
+                            const longitude = position.coords.longitude;
+
+                            latitudeInput.value = latitude;
+                            longitudeInput.value = longitude;
+
+                            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.display_name) {
+                                        locationInput.value = data.display_name;
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error("Error reverse geocoding:", error);
+                                });
+                        },
+                        function (error) {
+                            alert("Unable to retrieve your location. Please enable location services or enter manually.");
+                            console.error("Geolocation error:", error);
+                        }
+                    );
+                } else {
+                    alert("Geolocation is not supported by your browser.");
+                }
+            });
+        });
+    </script>
 </body>
 </html>
