@@ -1,7 +1,6 @@
 import os, random
 from django.shortcuts import render, redirect
-from .models import HarassmentReport, Upvote
-from .forms import HarassmentReportForm
+from .forms import HarassmentReportForm, CommentForm
 from geopy.geocoders import Nominatim
 import json
 from scipy.stats import gaussian_kde
@@ -11,35 +10,8 @@ from django.utils import timezone
 from datetime import timedelta
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
-from .models import HarassmentReport, Upvote
+from .models import HarassmentReport, Upvote, Comment
 
-def upvote_report(request, report_id):
-    if request.method == "POST":
-        try:
-            # Retrieve the report
-            report = get_object_or_404(HarassmentReport, id=report_id)
-            
-            # Get the user's IP address
-            ip_address = request.META.get('REMOTE_ADDR')
-            if not ip_address:
-                return JsonResponse({'status': 'error', 'message': 'Unable to determine IP address.'}, status=400)
-            
-            # Check if the user has already upvoted this report
-            if Upvote.objects.filter(ip_address=ip_address, report=report).exists():
-                return JsonResponse({'status': 'already_upvoted', 'upvotes': report.upvotes})
-            
-            # Add upvote
-            Upvote.objects.create(
-                ip_address=ip_address,
-                report=report
-            )
-            report.upvotes += 1
-            report.save()
-            
-            return JsonResponse({'status': 'success', 'upvotes': report.upvotes})
-        
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
         
 def predict_crime_hotspot():
     # Get all reports with latitude & longitude
@@ -107,6 +79,7 @@ def home(request):
 
 
 def reports_list(request):
+    # Retrieve all reports
     reports = HarassmentReport.objects.all().order_by('-timestamp')
 
     # Apply filters
@@ -117,12 +90,21 @@ def reports_list(request):
     if location_filter:
         reports = reports.filter(location__icontains=location_filter)
 
-    # Assign random profile images
-    images = os.listdir('harassment_platform/static/images/profile_pictures/')
-    for report in reports:
-        report.random_image = random.choice(images)
+    # Handle comment submission
+    if request.method == "POST":
+        report_id = request.POST.get('report_id')
+        report = get_object_or_404(HarassmentReport, id=report_id)
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.report = report
+            comment.save()
 
-    return render(request, 'reports.html', {'reports': reports})
+    context = {
+        'reports': reports,  # Pass the filtered reports to the template
+        'comment_form': CommentForm(),  # Pass an empty form for rendering
+    }
+    return render(request, 'reports.html', context)
 
 def report_submission(request):
     if request.method == "POST":

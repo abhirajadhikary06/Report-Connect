@@ -214,7 +214,6 @@
                     </div>
                 </form>
             </div>
-
             <!-- Reports Section -->
             <div class="reports-section">
                 <h1 class="title">List of Crime Reports</h1>
@@ -226,61 +225,62 @@
                 <div class="box">
                     {% for report in reports %}
                         <article class="media">
-                            <figure class="media-left">
-                                <p class="image is-64x64">
-                                    <img class="is-rounded" src="{% static 'images/profile_pictures/' %}{{ report.random_image }}" alt="Profile">
-                                </p>
-                            </figure>
-                            <div class="media-content">
-                                <div class="content">
-                                    <div class="report-header">
-                                        <span><b>{{ report.location }}</b></span> |
-                                        <span><b>{{ report.harassment_type }}</b></span> |
-                                        <span><b>{{ report.date|date:"M. j, Y" }}</b></span> |
-                                        <span><b>{{ report.time|time:"g:i a" }}</b></span>
-                                    </div>
-                                    <p class="report-description">
-                                        {{ report.description }}
-                                    </p>
-                                    <div class="upvote-section">
-                                        <form method="post" class="upvote-form">
-                                            {% csrf_token %}
-                                            <button type="button" class="button is-primary upvote-btn" data-report-id="{{ report.id }}">
-                                                👍 Upvote
-                                            </button>
-                                        </form>
-                                        <span id="upvote-count-{{ report.id }}" class="tag is-info">
-                                            {{ report.upvotes }} Upvotes
-                                        </span>
-                                    </div>
-                                </div>
+                            <div class="report-header">
+                                <span><b>{{ report.location }}</b></span> |
+                                <span><b>{{ report.harassment_type }}</b></span> |
+                                <span><b>{{ report.date|date:"M. j, Y" }}</b></span> |
+                                <span><b>{{ report.time|time:"g:i a" }}</b></span>
                             </div>
+                            <p class="report-description">{{ report.description }}</p>
+
+                            <!-- Comments Section -->
+                            <div class="comments-section">
+                                <h4>Comments</h4>
+                                {% if report.comments.exists %}
+                                    <ul>
+                                        {% for comment in report.comments.all %}
+                                            <li>
+                                                <p>{{ comment.text }}</p>
+                                                <small>Posted on: {{ comment.created_at|date:"F j, Y" }}</small>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p>No comments yet.</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Comment Form -->
+                            <form method="post" action="{% url 'reports_list' %}" class="comment-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="report_id" value="{{ report.id }}">
+                                {{ comment_form.as_p }}
+                                <button type="submit" class="button is-small is-primary">Submit Comment</button>
+                            </form>
                         </article>
                     {% endfor %}
                 </div>
             </div>
         </div>
     </section>
-
     <!-- Footer Section -->
     <section>
         <footer>
             <p>Made with <span>❤️</span> by <b>Quantum Coders</b> team</p>
         </footer>
     </section>
-
     <!-- JavaScript for Upvote Feature -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             // Get the CSRF token from the hidden input field
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        
+
             // Add click event listeners to all upvote buttons
             document.querySelectorAll(".upvote-btn").forEach(button => {
                 button.addEventListener("click", function () {
                     // Get the report ID from the button's data attribute
                     const reportId = this.getAttribute("data-report-id");
-        
+
                     // Send a POST request to the server
                     fetch(`/upvote/${reportId}/`, {
                         method: "POST",
