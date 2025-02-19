@@ -7,8 +7,8 @@ import json
 from scipy.stats import gaussian_kde
 import numpy as np 
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-
+from django.utils import timezone
+from datetime import timedelta
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from .models import HarassmentReport, Upvote
@@ -68,9 +68,6 @@ def predict_crime_hotspot():
     
     return hotspots
 
-from datetime import timedelta
-from django.utils import timezone
-
 def home(request):
     # Get all reports from the database
     reports = HarassmentReport.objects.all()
@@ -87,8 +84,6 @@ def home(request):
         reports = reports.filter(timestamp__gte=one_day_ago)
     elif time_filter == 'last_7_days':
         reports = reports.filter(timestamp__gte=seven_days_ago, timestamp__lt=one_day_ago)
-    elif time_filter == 'before_last_7_days':
-        reports = reports.filter(timestamp__gte=fourteen_days_ago, timestamp__lt=seven_days_ago)
 
     # Convert reports to a format suitable for JavaScript
     reports_data = [

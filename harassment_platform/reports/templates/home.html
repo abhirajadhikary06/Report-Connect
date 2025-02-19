@@ -376,12 +376,11 @@
         </a>
     </div>
 </nav>
-<!-- Add this section above the map container -->
 <div class="filters">
     <h3>Filter Reports:</h3>
     <button class="filter-button" onclick="applyFilter('current_day')">Current Day</button>
     <button class="filter-button" onclick="applyFilter('last_7_days')">Last 7 Days</button>
-    <button class="filter-button" onclick="applyFilter('before_last_7_days')">Before Last 7 Days</button>
+    <button class="filter-button" onclick="applyFilter('all')">Show All</button>
 </div>
 
 <!-- Hero Section -->
@@ -424,23 +423,26 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     
     <script>
-        // Function to apply filter
-        function applyFilter(filter) {
-            const url = new URL(window.location.href);
-            url.searchParams.set('time_filter', filter);
-            window.location.href = url.toString();
-        }
-    
         // Initialize Map
         var map = L.map('map').setView([22.5726, 88.3639], 12);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
         }).addTo(map);
     
-        try {
-            const reports = JSON.parse('{{ reports|safe }}');
-            reports.forEach(report => {
-                if (report.lat && report.lng) {  // Check if coordinates exist
+        // Parse reports data
+        const allReports = JSON.parse('{{ reports|safe }}');
+        let currentMarkers = [];
+    
+        // Function to clear existing markers
+        function clearMarkers() {
+            currentMarkers.forEach(marker => marker.remove());
+            currentMarkers = [];
+        }
+    
+        // Function to add markers to the map
+        function addMarkers(filteredReports) {
+            filteredReports.forEach(report => {
+                if (report.lat && report.lng) {
                     const circle = L.circle([report.lat, report.lng], {
                         color: 'red',
                         fillColor: '#f03',
@@ -453,11 +455,41 @@
                         <strong>Location:</strong> ${report.location}<br>
                         <strong>Type:</strong> ${report.type}
                     `);
+    
+                    currentMarkers.push(circle);
                 }
             });
-        } catch (e) {
-            console.error("Error parsing reports:", e);
         }
+    
+        // Function to apply filter
+        function applyFilter(filter) {
+            clearMarkers();
+    
+            const now = new Date();
+            const oneDayAgo = new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000);
+            const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+    
+            let filteredReports = [];
+            if (filter === 'current_day') {
+                filteredReports = allReports.filter(report => new Date(report.timestamp) >= oneDayAgo);
+            } else if (filter === 'last_7_days') {
+                filteredReports = allReports.filter(
+                    report => new Date(report.timestamp) >= sevenDaysAgo && new Date(report.timestamp) < oneDayAgo
+                );
+            } else if (filter === 'before_last_7_days') {
+                filteredReports = allReports.filter(
+                    report => new Date(report.timestamp) >= fourteenDaysAgo && new Date(report.timestamp) < sevenDaysAgo
+                );
+            } else if (filter === 'all') {
+                filteredReports = allReports;
+            }
+    
+            addMarkers(filteredReports);
+        }
+    
+        // Initialize the map with all reports
+        applyFilter('all');
     
         // Initialize Hotspot Map
         var hotspotsData = JSON.parse('{{ hotspot | escapejs }}');
