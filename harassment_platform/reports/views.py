@@ -68,28 +68,46 @@ def predict_crime_hotspot():
     
     return hotspots
 
+from datetime import timedelta
+from django.utils import timezone
+
 def home(request):
     # Get all reports from the database
     reports = HarassmentReport.objects.all()
-    
+
+    # Calculate date ranges
+    now = timezone.now()
+    one_day_ago = now - timedelta(days=1)
+    seven_days_ago = now - timedelta(days=7)
+    fourteen_days_ago = now - timedelta(days=14)
+
+    # Apply time filter if provided
+    time_filter = request.GET.get('time_filter')
+    if time_filter == 'current_day':
+        reports = reports.filter(timestamp__gte=one_day_ago)
+    elif time_filter == 'last_7_days':
+        reports = reports.filter(timestamp__gte=seven_days_ago, timestamp__lt=one_day_ago)
+    elif time_filter == 'before_last_7_days':
+        reports = reports.filter(timestamp__gte=fourteen_days_ago, timestamp__lt=seven_days_ago)
+
     # Convert reports to a format suitable for JavaScript
     reports_data = [
         {
-            'lat': report.latitude,  # Make sure these match your model field names
+            'lat': report.latitude,
             'lng': report.longitude,
             'location': report.location,
-            'type': report.harassment_type
+            'type': report.harassment_type,
+            'timestamp': report.timestamp.isoformat(),  # Include timestamp for debugging
         } for report in reports
     ]
-       
+
     # Get predicted hotspot
     predicted_hotspot = predict_crime_hotspot()
-
     context = {
         'reports': json.dumps(reports_data),
-        'hotspot': json.dumps(predicted_hotspot) if predicted_hotspot else None
+        'hotspot': json.dumps(predicted_hotspot) if predicted_hotspot else None,
+        'time_filter': time_filter,  # Pass the selected filter back to the template
     }
-
     return render(request, 'home.html', context)
 
 
