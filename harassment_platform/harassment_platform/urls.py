@@ -20,7 +20,8 @@ from reports import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.home, name='home'),
+    path('', views.landing_page, name='landingpage'),
+    path('home/', views.home, name='home'),
     path('reports/', views.reports_list, name='reports_list'),
     path('submit/', views.report_submission, name='report_submission'),
 ]
