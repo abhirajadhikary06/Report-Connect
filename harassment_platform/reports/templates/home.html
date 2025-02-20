@@ -27,6 +27,7 @@
             flex: 1; /* Ensures body takes up remaining space */
         }
 
+
         /* Navbar Styling */
         .navbar {
             background: transparent;
@@ -365,6 +366,50 @@
                 color: #FF4500;
                 text-decoration: underline;
             }
+
+        /* Add this to your existing CSS */
+        .filters {
+            background: transparent;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            margin-bottom: 15px;
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto 15px auto; /* Center the filter box */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px; /* Space between the elements */
+        }
+
+        .filters h3 {
+            margin: 0;
+            color: #FFD700; /* Gold color */
+            font-size: 18px;
+        }
+
+        .filter-dropdown {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #FFD700; /* Gold border */
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #444;
+            color: #fff;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .filter-dropdown:hover {
+            background-color: #555;
+            border-color: #FF4500; /* Orange-red border on hover */
+        }
+
+        .filter-dropdown option {
+            background-color: #444;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -376,12 +421,6 @@
         </a>
     </div>
 </nav>
-<div class="filters">
-    <h3>Filter Reports:</h3>
-    <button class="filter-button" onclick="applyFilter('current_day')">Current Day</button>
-    <button class="filter-button" onclick="applyFilter('last_7_days')">Last 7 Days</button>
-    <button class="filter-button" onclick="applyFilter('all')">Show All</button>
-</div>
 
 <!-- Hero Section -->
 <section class="hero is-info is-bold">
@@ -406,12 +445,25 @@
 
 <!-- Main Map and Quotes Section -->
 <section class="section">
-    <div class="map-and-info clearfix">
-        <!-- Map Section -->
-        <div class="map-container" id="map"></div>
-        <!-- Hotspot Map Section -->
-        <h1 class="map-heading title heading-style">AI-Powered Crime Hotspots</h1>
-        <div class="map-container" id="hotspot-map"></div>
+    <div class="container">
+        <!-- Filter Section -->
+        <div class="filters">
+            <h3>Filter Reports:</h3>
+            <select id="filter-dropdown" class="filter-dropdown" onchange="applyFilter()">
+                <option value="all">All Reports</option>
+                <option value="current_day">Current Day</option>
+                <option value="last_7_days">Last 7 Days</option>
+                <option value="before_last_7_days">Before Last 7 Days</option>
+            </select>
+        </div>
+
+        <div class="map-and-info clearfix">
+            <!-- Map Section -->
+            <div class="map-container" id="map"></div>
+            <!-- Hotspot Map Section -->
+            <h1 class="map-heading title heading-style">AI-Powered Crime Hotspots</h1>
+            <div class="map-container" id="hotspot-map"></div>
+        </div>
     </div>
 </section>
 
@@ -420,105 +472,80 @@
     <p>Made with <span>❤️</span> by <b>Glitch Goblins</b> team</p>
 </footer>
 
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    
-    <script>
-        // Initialize Map
-        var map = L.map('map').setView([22.5726, 88.3639], 12);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
-        }).addTo(map);
-    
-        // Parse reports data
-        const allReports = JSON.parse('{{ reports|safe }}');
-        let currentMarkers = [];
-    
-        // Function to clear existing markers
-        function clearMarkers() {
-            currentMarkers.forEach(marker => marker.remove());
-            currentMarkers = [];
-        }
-    
-        // Function to add markers to the map
-        function addMarkers(filteredReports) {
-            filteredReports.forEach(report => {
-                if (report.lat && report.lng) {
-                    const circle = L.circle([report.lat, report.lng], {
-                        color: 'red',
-                        fillColor: '#f03',
-                        fillOpacity: 0.1,
-                        radius: 50
-                    }).addTo(map);
-    
-                    // Add popup with information
-                    circle.bindPopup(`
-                        <strong>Location:</strong> ${report.location}<br>
-                        <strong>Type:</strong> ${report.type}
-                    `);
-    
-                    currentMarkers.push(circle);
-                }
-            });
-        }
-    
-        // Function to apply filter
-        function applyFilter(filter) {
-            clearMarkers();
-    
-            const now = new Date();
-            const oneDayAgo = new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000);
-            const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-            const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
-    
-            let filteredReports = [];
-            if (filter === 'current_day') {
-                filteredReports = allReports.filter(report => new Date(report.timestamp) >= oneDayAgo);
-            } else if (filter === 'last_7_days') {
-                filteredReports = allReports.filter(
-                    report => new Date(report.timestamp) >= sevenDaysAgo && new Date(report.timestamp) < oneDayAgo
-                );
-            } else if (filter === 'before_last_7_days') {
-                filteredReports = allReports.filter(
-                    report => new Date(report.timestamp) >= fourteenDaysAgo && new Date(report.timestamp) < sevenDaysAgo
-                );
-            } else if (filter === 'all') {
-                filteredReports = allReports;
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+    // Function to apply filter
+    function applyFilter() {
+        const filterValue = document.getElementById("filter-dropdown").value;
+        const url = new URL(window.location.href);
+        url.searchParams.set('time_filter', filterValue);
+        window.location.href = url.toString(); // Reloads the page with the selected filter
+    }
+
+    // Initialize Map
+    var map = L.map('map').setView([22.5726, 88.3639], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    try {
+        const reports = JSON.parse('{{ reports|safe }}');
+        reports.forEach(report => {
+            if (report.lat && report.lng) {  // Check if coordinates exist
+                const circle = L.circle([report.lat, report.lng], {
+                    color: 'red',
+                    fillColor: '#f03',
+                    fillOpacity: 0.1,
+                    radius: 50
+                }).addTo(map);
+
+                // Add popup with information
+                circle.bindPopup(`
+                    <strong>Location:</strong> ${report.location}<br>
+                    <strong>Type:</strong> ${report.type}
+                `);
             }
-    
-            addMarkers(filteredReports);
-        }
-    
-        // Initialize the map with all reports
-        applyFilter('all');
-    
-        // Initialize Hotspot Map
-        var hotspotsData = JSON.parse('{{ hotspot | escapejs }}');
-        var hotspotMap = L.map('hotspot-map').setView([22.5726, 88.3639], 12);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
-        }).addTo(hotspotMap);
-    
-        hotspotsData.forEach(function(hotspot) {
-            L.marker([hotspot.lat, hotspot.lng])
-                .addTo(hotspotMap)
-                .bindPopup("<b>" + hotspot.title + "</b><br>" + hotspot.description);
         });
-    
-        try {
-            const hotspot = JSON.parse('{{ hotspot|safe }}');
-            if (hotspot && hotspot.lat && hotspot.lng) {
-                L.marker([hotspot.lat, hotspot.lng], {
-                    icon: L.divIcon({
-                        className: 'custom-icon',
-                        html: '<div style="background:#d4fc79; width:12px; height:12px; border-radius:50%;"></div>', /* Neon Hotspot Color */
-                        iconSize: [12, 12]
-                    })
-                }).addTo(hotspotMap).bindPopup('<strong>Predicted Crime Hotspot</strong>');
-            }
-        } catch (e) {
-            console.error("Error parsing hotspot data:", e);
+    } catch (e) {
+        console.error("Error parsing reports:", e);
+    }
+
+    // Initialize Hotspot Map
+    var hotspotsData = JSON.parse('{{ hotspot | escapejs }}');
+    var hotspotMap = L.map('hotspot-map').setView([22.5726, 88.3639], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+    }).addTo(hotspotMap);
+
+    hotspotsData.forEach(function(hotspot) {
+        L.marker([hotspot.lat, hotspot.lng])
+            .addTo(hotspotMap)
+            .bindPopup("<b>" + hotspot.title + "</b><br>" + hotspot.description);
+    });
+
+    try {
+        const hotspot = JSON.parse('{{ hotspot|safe }}');
+        if (hotspot && hotspot.lat && hotspot.lng) {
+            L.marker([hotspot.lat, hotspot.lng], {
+                icon: L.divIcon({
+                    className: 'custom-icon',
+                    html: '<div style="background:#d4fc79; width:12px; height:12px; border-radius:50%;"></div>', /* Neon Hotspot Color */
+                    iconSize: [12, 12]
+                })
+            }).addTo(hotspotMap).bindPopup('<strong>Predicted Crime Hotspot</strong>');
         }
-    </script>
+    } catch (e) {
+        console.error("Error parsing hotspot data:", e);
+    }
+
+    // Preserve selected filter on page reload
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedFilter = urlParams.get('time_filter') || "all";
+        document.getElementById("filter-dropdown").value = selectedFilter;
+    });
+</script>
     
 </body>
 </html>
