@@ -112,13 +112,50 @@ def reports_list(request):
 
 def report_submission(request):
     if request.method == "POST":
-        form = HarassmentReportForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('report_submission')  # Redirect to the same page to prevent form resubmission
-    else:
-        form = HarassmentReportForm()
-    return render(request, 'report_submission.html', {'form': form})
+        location = request.POST.get('location')
+        date = request.POST.get('date')
+        time = request.POST.get('time')
+        harassment_type = request.POST.get('harassment_type')
+        reported_by = request.POST.get('role')
+        description = request.POST.get('description')
+        
+
+        # Validate harassment_type
+        if not harassment_type:
+            return render(request, 'report_submission.html', {'error': 'Harassment type is required.'})
+
+        try:
+            # Geocode the location to get latitude and longitude
+            geolocator = Nominatim(user_agent="harassment_report_app")
+            location_data = geolocator.geocode(location)
+            
+            if location_data:
+                latitude = location_data.latitude
+                longitude = location_data.longitude
+            else:
+                return render(request, 'report_submission.html', 
+                            {'error': 'Could not find coordinates for the given location.'})
+
+            # Save the data to the database
+            HarassmentReport.objects.create(
+                location=location,
+                date=date,
+                time=time,
+                harassment_type=harassment_type,
+                reported_by=reported_by,
+                description=description,
+                latitude=latitude,
+                longitude=longitude
+            )
+
+            # Add a success message and redirect to the same page
+            return render(request, 'report_submission.html', {'success': True})
+            
+        except Exception as e:
+            return render(request, 'report_submission.html', 
+                        {'error': f'Error processing location: {str(e)}'})
+    
+    return render(request, 'report_submission.html')
 
 
 def add_comment(request, report_id):
