@@ -62,7 +62,10 @@ This project is an **AI-driven platform** that allows users to **anonymously rep
 ### 3️⃣ **Prediction Mechanism**
 - The AI model **analyzes historical crime data**.
 - KDE determines the **most likely future crime locations**.
-- The **top 5 hotspots are displayed with decreasing intensity** (green border with blurred green inside).
+- The **top 20 hotspots are displayed with decreasing intensity** (green border with blurred green inside).
+
+### 4️⃣ **Prediction Mechanism**
+- Community commenting feature **to discuss about the crimes**.
 
 ---
 
